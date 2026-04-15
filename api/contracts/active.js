@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   // CORS setup for Webflow
   res.setHeader(
     "Access-Control-Allow-Origin",
-    "https://one-power-fitness.webflow.io/",
+    "https://one-power-fitness.webflow.io",
   );
 
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
