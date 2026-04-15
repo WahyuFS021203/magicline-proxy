@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       `[API Proxy] Fetching Magicline data for customer ID: ${customerId}`,
     );
 
-    const url = `https://openapi.magicline.com/v1/customers/${customerId}`;
+    const url = `https://one-power-fitness-abensberg.open-api.sandbox.magicline.com/v1/customers/${customerId}`;
 
     const response = await fetch(url, {
       method: "GET",
