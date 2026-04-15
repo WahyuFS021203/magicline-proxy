@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    "https://your-webflow-domain.com",
+    "https://one-power-fitness.webflow.io/",
   );
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
 
