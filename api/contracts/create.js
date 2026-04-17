@@ -1,9 +1,9 @@
 export default async function handler(req, res) {
-  // Pengaturan CORS untuk Webflow
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://one-power-fitness.webflow.io",
   );
+
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 
   try {
     console.log(
-      `[API Proxy] Membuat kontrak baru untuk: ${payload.customer.firstname} ${payload.customer.lastname} (Studio: ${payload.studioId})`,
+      `[API Proxy] Membuat kontrak baru (Studio: ${payload.studioId || "Default"})`,
     );
 
     const url =
@@ -40,6 +40,7 @@ export default async function handler(req, res) {
       headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
+        "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
       },
       body: JSON.stringify(payload),
     });
