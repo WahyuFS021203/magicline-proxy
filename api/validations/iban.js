@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     console.log(`[API Proxy] Memvalidasi IBAN: ${iban}`);
 
     const baseUrl =
-      "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
+      "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
 
     const url = `${baseUrl}/connect/v1/bankaccount?iban=${iban}`;
 
