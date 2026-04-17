@@ -15,27 +15,26 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== "POST") {
-    console.warn(`[API Proxy] Invalid method: ${req.method}`);
     return res
       .status(405)
       .json({ errorCodes: ["METHOD_NOT_ALLOWED"], message: "Gunakan POST." });
   }
 
-  // 4. Ambil dan validasi reCAPTCHA Token dari URL Parameter
+  const clientIp =
+    req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "";
+
+  // 3. Ambil reCAPTCHA Token dari URL Parameter
   const { recaptchaToken } = req.query;
   if (!recaptchaToken) {
-    console.error("[API Proxy] Missing recaptchaToken");
     return res.status(400).json({
       errorCodes: ["BAD_REQUEST"],
       message: "recaptchaToken wajib diisi",
     });
   }
 
-  // 5. Ambil data dari Body
   const { firstname, lastname, dateOfBirth, customerNumber } = req.body || {};
 
   if (!firstname || !lastname || !dateOfBirth) {
-    console.error("[API Proxy] Missing required body fields");
     return res.status(400).json({
       errorCodes: ["BAD_REQUEST"],
       message: "firstname, lastname, dan dateOfBirth wajib diisi",
@@ -43,8 +42,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log(`[API Proxy] Mencari kontrak untuk: ${firstname} ${lastname}`);
-
+    // Gunakan subdomain 'api' sesuai dokumentasi terbaru
     const baseUrl =
       "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
     const url = `${baseUrl}/connect/v1/contracts?recaptchaToken=${recaptchaToken}`;
@@ -54,8 +52,7 @@ export default async function handler(req, res) {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "X-Forwarded-For": clientIp,
       },
       body: JSON.stringify({
         firstname,
@@ -75,7 +72,6 @@ export default async function handler(req, res) {
       }
     }
 
-    // 8. Cek jika terjadi error dari Magicline
     if (!response.ok) {
       console.error(`[API Proxy] Magicline Error (${response.status}):`, data);
       return res.status(response.status).json({
@@ -84,8 +80,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // 9. Berhasil!
-    console.log(`[API Proxy] Kontrak berhasil ditemukan!`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server crash:", error);
