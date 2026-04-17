@@ -45,20 +45,19 @@ export default async function handler(req, res) {
     // Gunakan subdomain 'api' sesuai dokumentasi terbaru
     const baseUrl =
       "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
-    const url = `${baseUrl}/connect/v1/contracts?recaptchaToken=${recaptchaToken}`;
+    const url = `${baseUrl}/connect/v1/contracts?recaptchaToken=${encodeURIComponent(recaptchaToken)}`;
 
     const response = await fetch(url, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        "X-Forwarded-For": clientIp,
       },
       body: JSON.stringify({
-        firstname,
-        lastname,
-        dateOfBirth,
-        customerNumber,
+        firstname: firstname.trim(),
+        lastname: lastname.trim(),
+        dateOfBirth: dateOfBirth,
+        customerNumber: customerNumber ? customerNumber.trim() : "",
       }),
     });
 
