@@ -40,7 +40,6 @@ export default async function handler(req, res) {
       headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
-        "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
       },
       body: JSON.stringify(payload),
     });
