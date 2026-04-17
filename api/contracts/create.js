@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     );
 
     const url =
-      "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com/connect/v1/rate-bundle";
+      "https://one-power-fitness-abensberg.api.sandbox.magicline.com/connect/v1/rate-bundle";
 
     const response = await fetch(url, {
       method: "POST",
