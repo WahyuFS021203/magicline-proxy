@@ -24,14 +24,14 @@ export default async function handler(req, res) {
       `[API Proxy] Mengambil data rate-bundles untuk studioId: ${studioId}`,
     );
 
-    const url = `https://one-power-fitness-abensberg.open-api.sandbox.magicline.com/connect/v1/rate-bundle?studioId=${studioId}`;
+    const url = `https://one-power-fitness-abensberg.api.sandbox.magicline.com/connect/v1/rate-bundle?studioId=${studioId}`;
 
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        Accept: "*/*",
-        "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
-      },
+      // headers: {
+      //   Accept: "*/*",
+      //   "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
+      // },
     });
 
     const responseText = await response.text();
