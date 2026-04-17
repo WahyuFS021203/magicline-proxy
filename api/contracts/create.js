@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // Pengaturan CORS untuk Webflow
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://one-power-fitness.webflow.io",
@@ -9,7 +10,6 @@ export default async function handler(req, res) {
     "Content-Type, Authorization, x-api-key",
   );
 
-  // Tangani preflight request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
@@ -18,38 +18,20 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed. Use POST." });
   }
 
-  // Tangkap seluruh payload dari Webflow
-  const payload = req.body || {};
+  let payload = req.body || {};
 
-  // Validasi Level 1 (Required Root Fields)
-  if (!payload.contract || !payload.customer || !payload.studioId) {
+  if (!payload.contract || !payload.customer) {
     return res.status(400).json({
-      error: "Missing required root fields",
-      message: "'contract', 'customer', and 'studioId' objects are mandatory.",
-    });
-  }
-
-  // Validasi Level 2 (Beberapa field required utama di dalam customer)
-  const { customer, contract } = payload;
-  if (
-    !customer.firstname ||
-    !customer.lastname ||
-    !customer.email ||
-    !customer.dateOfBirth
-  ) {
-    return res.status(400).json({
-      error: "Missing required customer fields",
-      message:
-        "Customer must include firstname, lastname, email, and dateOfBirth.",
+      errorCodes: ["BAD_REQUEST"],
+      message: "Objek 'contract' dan 'customer' wajib dikirimkan.",
     });
   }
 
   try {
     console.log(
-      `[API Proxy] Creating new contract for: ${customer.firstname} ${customer.lastname}`,
+      `[API Proxy] Membuat kontrak baru untuk: ${payload.customer.firstname} ${payload.customer.lastname} (Studio: ${payload.studioId})`,
     );
 
-    // Gunakan URL Sandbox Magicline Anda
     const url =
       "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com/connect/v1/rate-bundle";
 
@@ -58,30 +40,36 @@ export default async function handler(req, res) {
       headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
-        "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
       },
-      // Mengirimkan data persis seperti yang dikirim oleh Webflow
       body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data = {};
+    if (responseText) {
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        data = { message: responseText };
+      }
+    }
 
     if (!response.ok) {
-      console.error(
-        `[API Proxy] Magicline Error (${response.status}):`,
-        data.message,
-      );
+      console.error(`[API Proxy] Magicline Error (${response.status}):`, data);
       return res.status(response.status).json({
-        error: data.errorCodes || "MAGICLINE_API_ERROR",
-        message:
-          data.message || "An error occurred while creating the contract",
+        errorCodes: data.errorCodes || ["SERVER_ERROR"],
+        message: data.message || "Terjadi kesalahan dari API Magicline",
+        traceId: data.traceId,
       });
     }
 
-    console.log(`[API Proxy] Successfully created contract & customer!`);
+    console.log(`[API Proxy] Kontrak berhasil dibuat!`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server connection failed:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({
+      errorCodes: ["SERVER_ERROR"],
+      message: "Internal server error",
+    });
   }
 }

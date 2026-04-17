@@ -10,17 +10,14 @@ export default async function handler(req, res) {
     "Content-Type, Authorization, x-api-key",
   );
 
-  // Tangani preflight request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // Hanya izinkan method GET
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method Not Allowed. Use GET." });
   }
 
-  // Tangkap parameter nama pemilik rekening dari URL
   const { accountHolder } = req.query;
 
   if (!accountHolder) {
