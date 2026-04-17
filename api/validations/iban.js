@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     const baseUrl =
       "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
 
-    const url = `${baseUrl}/connect/v1/bankaccount?iban=${encodeURIComponent(iban)}`;
+    const url = `${baseUrl}/connect/v1/bankaccount?iban=${iban}`;
 
     const response = await fetch(url, {
       method: "GET",

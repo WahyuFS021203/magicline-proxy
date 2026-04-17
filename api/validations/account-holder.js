@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     // diubah menjadi format URL yang aman ("John%20Doe")
     const baseUrl =
       "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
-    const url = `${baseUrl}/connect/v1/bankaccount/validate/accountholder?accountHolder=${encodeURIComponent(accountHolder)}`;
+    const url = `${baseUrl}/connect/v1/bankaccount/validate/accountholder?accountHolder=${accountHolder}`;
 
     const response = await fetch(url, {
       method: "GET",
