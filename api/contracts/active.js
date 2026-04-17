@@ -47,7 +47,8 @@ export default async function handler(req, res) {
       `[API Proxy - Contracts] Fetching active contracts for: ${firstname} ${lastname}`,
     );
 
-    const baseUrl = "https://openapi.magicline.com";
+    const baseUrl =
+      "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
     const url = `${baseUrl}/connect/v1/contracts?recaptchaToken=${recaptchaToken}`;
 
     const response = await fetch(url, {
@@ -55,19 +56,17 @@ export default async function handler(req, res) {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
       },
       body: JSON.stringify({
         firstname,
         lastname,
         dateOfBirth,
-        customerNumber, // Optional, will be undefined if not provided, which is fine
+        customerNumber,
       }),
     });
 
     const data = await response.json();
 
-    // Handle non-200 responses (403, 409, 500 as per docs)
     if (!response.ok) {
       console.error(
         `[API Proxy - Contracts] Magicline Error (${response.status}):`,
