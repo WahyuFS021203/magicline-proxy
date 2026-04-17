@@ -1,51 +1,49 @@
 export default async function handler(req, res) {
-  // CORS setup for Webflow
+  // 1. Pengaturan CORS
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://one-power-fitness.webflow.io",
   );
-
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, x-api-key",
+  );
 
-  // Handle preflight request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // Only allow POST method
   if (req.method !== "POST") {
-    console.warn(`[API Proxy - Contracts] Invalid method: ${req.method}`);
-    return res.status(405).json({ error: "Method Not Allowed. Use POST." });
-  }
-
-  // 1. Extract recaptchaToken from URL query
-  const { recaptchaToken } = req.query;
-
-  if (!recaptchaToken) {
-    console.error(
-      "[API Proxy - Contracts] Missing required query parameter: recaptchaToken",
-    );
+    console.warn(`[API Proxy] Invalid method: ${req.method}`);
     return res
-      .status(400)
-      .json({ error: "recaptchaToken is required in the URL query" });
+      .status(405)
+      .json({ errorCodes: ["METHOD_NOT_ALLOWED"], message: "Gunakan POST." });
   }
 
+  // 4. Ambil dan validasi reCAPTCHA Token dari URL Parameter
+  const { recaptchaToken } = req.query;
+  if (!recaptchaToken) {
+    console.error("[API Proxy] Missing recaptchaToken");
+    return res.status(400).json({
+      errorCodes: ["BAD_REQUEST"],
+      message: "recaptchaToken wajib diisi",
+    });
+  }
+
+  // 5. Ambil data dari Body
   const { firstname, lastname, dateOfBirth, customerNumber } = req.body || {};
 
-  // Validate required body fields based on documentation
   if (!firstname || !lastname || !dateOfBirth) {
-    console.error("[API Proxy - Contracts] Missing required body fields");
+    console.error("[API Proxy] Missing required body fields");
     return res.status(400).json({
-      error:
-        "firstname, lastname, and dateOfBirth are required in the request body",
+      errorCodes: ["BAD_REQUEST"],
+      message: "firstname, lastname, dan dateOfBirth wajib diisi",
     });
   }
 
   try {
-    console.log(
-      `[API Proxy - Contracts] Fetching active contracts for: ${firstname} ${lastname}`,
-    );
+    console.log(`[API Proxy] Mencari kontrak untuk: ${firstname} ${lastname}`);
 
     const baseUrl =
       "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
@@ -65,27 +63,33 @@ export default async function handler(req, res) {
       }),
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data = {};
+    if (responseText) {
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        data = { message: responseText };
+      }
+    }
 
+    // 8. Cek jika terjadi error dari Magicline
     if (!response.ok) {
-      console.error(
-        `[API Proxy - Contracts] Magicline Error (${response.status}):`,
-        data.message || "Unknown error",
-      );
+      console.error(`[API Proxy] Magicline Error (${response.status}):`, data);
       return res.status(response.status).json({
-        error: data.errorCodes || ["SERVER_ERROR"],
-        message: "An error occurred while fetching contracts from Magicline",
+        errorCodes: data.errorCodes || ["API_ERROR"],
+        message: data.message || "Gagal mengambil data dari Magicline",
       });
     }
 
-    console.log(
-      `[API Proxy - Contracts] Successfully retrieved contracts for: ${firstname} ${lastname}`,
-    );
+    // 9. Berhasil!
+    console.log(`[API Proxy] Kontrak berhasil ditemukan!`);
     return res.status(200).json(data);
   } catch (error) {
-    console.error("[API Proxy - Contracts] Server connection failed:", error);
-    return res
-      .status(500)
-      .json({ error: ["SERVER_ERROR"], message: "Internal server error" });
+    console.error("[API Proxy] Server crash:", error);
+    return res.status(500).json({
+      errorCodes: ["SERVER_ERROR"],
+      message: "Koneksi ke server gagal",
+    });
   }
 }
