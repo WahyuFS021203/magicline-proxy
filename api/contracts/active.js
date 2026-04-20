@@ -17,11 +17,10 @@ export default async function handler(req, res) {
     req.body || {};
 
   if (!recaptchaToken || !firstname || !lastname || !dateOfBirth) {
-    return res.status(400).json({ message: "Data tidak lengkap" });
+    return res.status(400).json({ message: "Data tidak lengkap di backend" });
   }
 
   try {
-    // Magicline tetap butuh token di URL, tapi ini dilakukan di SISI SERVER (Aman)
     const baseUrl =
       "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
     const url = `${baseUrl}/connect/v1/contracts?recaptchaToken=${encodeURIComponent(recaptchaToken)}`;
@@ -43,10 +42,31 @@ export default async function handler(req, res) {
       }),
     });
 
-    const data = await response.json();
-    return res.status(response.status).json(data);
+    const responseText = await response.text();
+    let data;
+
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      data = { message: responseText };
+    }
+
+    if (!response.ok) {
+      console.error(`[Magicline Error] Status: ${response.status}`, data);
+
+      return res.status(response.status).json({
+        errorCodes: data.errorCodes || ["API_ERROR"],
+        message: data.message || "Terjadi kesalahan pada sistem Magicline",
+        debug: data,
+      });
+    }
+
+    return res.status(200).json(data);
   } catch (error) {
-    console.error("Proxy Error:", error);
-    return res.status(500).json({ message: "Koneksi ke Magicline gagal" });
+    console.error("Proxy Crash Error:", error);
+    return res.status(500).json({
+      errorCodes: ["SERVER_CRASH"],
+      message: "Koneksi ke server proxy atau Magicline gagal total",
+    });
   }
 }
