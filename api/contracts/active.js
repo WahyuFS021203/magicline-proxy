@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // 1. CORS Headers
+  // 1. Tetap butuh CORS agar browser tidak memblokir response
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://one-power-fitness.webflow.io",
@@ -11,62 +11,43 @@ export default async function handler(req, res) {
   );
 
   if (req.method === "OPTIONS") return res.status(200).end();
-  if (req.method !== "POST")
-    return res.status(405).json({ message: "Gunakan POST" });
 
   const { recaptchaToken, firstname, lastname, dateOfBirth, customerNumber } =
     req.body || {};
-
-  // Validasi Input
-  if (!recaptchaToken || !firstname || !lastname || !dateOfBirth) {
-    return res
-      .status(400)
-      .json({ message: "Data tidak lengkap dari frontend" });
-  }
 
   try {
     const baseUrl =
       "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
     const url = `${baseUrl}/connect/v1/contracts?recaptchaToken=${encodeURIComponent(recaptchaToken)}`;
 
-    console.log(
-      "Memanggil Magicline dengan API Key:",
-      process.env.MAGICLINE_OPEN_API_KEY ? "TERSEDIA" : "KOSONG",
-    );
-
     const response = await fetch(url, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/119.0.0.0",
       },
       body: JSON.stringify({
-        firstname: firstname.trim(),
-        lastname: lastname.trim(),
+        firstname: firstname?.trim(),
+        lastname: lastname?.trim(),
         dateOfBirth: dateOfBirth,
         customerNumber: customerNumber ? customerNumber.trim() : "",
       }),
     });
 
-    const responseText = await response.text();
+    const rawBody = await response.text();
 
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      data = {
-        message: "Magicline tidak mengembalikan JSON",
-        rawError: responseText,
-      };
+    const contentType = response.headers.get("content-type");
+    if (contentType) {
+      res.setHeader("Content-Type", contentType);
     }
 
-    return res.status(response.status).json(data);
+    return res.status(response.status).send(rawBody);
   } catch (error) {
-    console.error("Proxy Error Detail:", error.message);
-
-    return res.status(500).json({
-      message: "Koneksi ke Magicline gagal (Crash)",
-      error: error.message,
-    });
+    return res
+      .status(500)
+      .json({ error: "Proxy Crash", message: error.message });
   }
 }
