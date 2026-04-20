@@ -44,8 +44,6 @@ export default async function handler(req, res) {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
         "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
       },
       body: JSON.stringify(payload),
