@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // 1. Pengaturan CORS agar bisa diakses dari Webflow
+  // CORS Headers
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://one-power-fitness.webflow.io",
@@ -9,47 +9,44 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Gunakan POST" });
-  }
-
   const { recaptchaToken, customerNumber, dateOfBirth, firstname, lastname } =
     req.body || {};
 
   try {
-    const query = new URLSearchParams({
-      recaptchaToken: recaptchaToken,
-    }).toString();
-
-    // URL Tenant Anda
-    const tenantUrl =
-      "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
-    const targetUrl = `${tenantUrl}/connect/v1/contracts?${query}`;
+    const query = new URLSearchParams({ recaptchaToken }).toString();
+    const targetUrl = `https://one-power-fitness-abensberg.api.sandbox.magicline.com/connect/v1/contracts?${query}`;
 
     const resp = await fetch(targetUrl, {
       method: "POST",
       headers: {
+        Accept: "application/json, text/plain, */*",
         "Content-Type": "application/json",
+        // HEADER KRUSIAL: Meniru Browser Webflow
         "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Origin: "https://one-power-fitness.webflow.io",
+        Referer: "https://one-power-fitness.webflow.io/",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "cross-site",
       },
       body: JSON.stringify({
-        customerNumber: customerNumber ? customerNumber.trim() : "",
+        customerNumber: customerNumber ? String(customerNumber).trim() : "",
         dateOfBirth: dateOfBirth,
-        firstname: firstname ? firstname.trim() : "",
-        lastname: lastname ? lastname.trim() : "",
+        firstname: firstname ? String(firstname).trim() : "",
+        lastname: lastname ? String(lastname).trim() : "",
       }),
     });
 
     const responseText = await resp.text();
 
+    // Kirim status dan body apa adanya dari Magicline
     res.setHeader("Content-Type", "application/json");
     return res.status(resp.status).send(responseText);
   } catch (error) {
-    console.error("Proxy Error:", error.message);
-    return res.status(500).json({
-      message: "Gagal terhubung ke API Magicline",
-      error: error.message,
-    });
+    return res
+      .status(500)
+      .json({ message: "Proxy Error", error: error.message });
   }
 }
