@@ -39,9 +39,6 @@ export default async function handler(req, res) {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        "x-api-key": process.env.MAGICLINE_OPEN_API_KEY || "",
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/119.0.0.0",
       },
       body: JSON.stringify({
         firstname: firstname.trim(),
