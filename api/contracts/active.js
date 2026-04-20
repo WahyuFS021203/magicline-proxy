@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // 1. Pengaturan CORS
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://one-power-fitness.webflow.io",
@@ -23,7 +22,6 @@ export default async function handler(req, res) {
   const clientIp =
     req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "";
 
-  // 3. Ambil reCAPTCHA Token dari URL Parameter
   const { recaptchaToken } = req.query;
   if (!recaptchaToken) {
     return res.status(400).json({
@@ -42,7 +40,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Gunakan subdomain 'api' sesuai dokumentasi terbaru
     const baseUrl =
       "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
     const url = `${baseUrl}/connect/v1/contracts?recaptchaToken=${encodeURIComponent(recaptchaToken)}`;
@@ -52,10 +49,9 @@ export default async function handler(req, res) {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
         "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        Origin: "https://one-power-fitness.webflow.io",
-        Referer: "https://one-power-fitness.webflow.io/",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
       },
       body: JSON.stringify({
         firstname: firstname.trim(),
