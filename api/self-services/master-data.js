@@ -1,51 +1,86 @@
 export default async function handler(req, res) {
+  // 1. Pengaturan CORS (Izinkan GET dan POST)
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://one-power-fitness.webflow.io",
   );
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, x-api-key",
   );
 
+  // 2. Tangani Preflight Request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  if (req.method !== "GET") {
+  // 3. Pastikan hanya GET atau POST yang diizinkan
+  if (req.method !== "GET" && req.method !== "POST") {
     return res.status(405).json({
       errorCodes: ["METHOD_NOT_ALLOWED"],
-      message: "Gunakan metode GET.",
+      message: "Gunakan metode GET atau POST.",
     });
   }
 
+  // 4. Validasi parameter customerId
   const { customerId } = req.query;
 
   if (!customerId) {
     return res.status(400).json({
       errorCodes: ["BAD_REQUEST"],
-      message: "Parameter 'customerId' wajib diisi.",
+      message: "Parameter 'customerId' wajib disertakan di URL.",
     });
   }
 
+  // Pengaturan URL Magicline
+  const baseUrl =
+    "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
+  const url = `${baseUrl}/v1/customers/${customerId}/self-service/master-data`;
+  const apiKey = process.env.MAGICLINE_OPEN_API_KEY;
+
   try {
-    console.log(
-      `[API Proxy] Mengambil Master Data untuk Customer ID: ${customerId}`,
-    );
+    let response; // Variabel penampung respons
 
-    const baseUrl =
-      "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
-    const url = `${baseUrl}/v1/customers/${customerId}/self-service/master-data`;
+    // ==========================================
+    // METODE 1: JIKA WEBFLOW MEMINTA DATA (GET)
+    // ==========================================
+    if (req.method === "GET") {
+      console.log(
+        `[API Proxy] GET: Mengambil Master Data untuk Customer ID: ${customerId}`,
+      );
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
-      },
-    });
+      response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "x-api-key": apiKey,
+        },
+      });
+    }
+    // ==========================================
+    // METODE 2: JIKA WEBFLOW MENGIRIM DATA (POST)
+    // ==========================================
+    else if (req.method === "POST") {
+      console.log(
+        `[API Proxy] POST: Memperbarui Master Data untuk Customer ID: ${customerId}`,
+      );
 
+      const payload = req.body || {};
+
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+        },
+        body: JSON.stringify(payload),
+      });
+    }
+
+    // ==========================================
+    // PARSING & RETURN RESPONSE (BERLAKU UNTUK KEDUA METODE)
+    // ==========================================
     const responseText = await response.text();
     let data = {};
     if (responseText) {
@@ -63,11 +98,11 @@ export default async function handler(req, res) {
         message:
           data.message ||
           data.errorMessage ||
-          "Gagal mengambil data profil dari Magicline",
+          "Gagal memproses data profil di Magicline",
       });
     }
 
-    console.log(`[API Proxy] Master Data berhasil diambil!`);
+    console.log(`[API Proxy] Master Data berhasil diproses (${req.method})!`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server crash:", error);
