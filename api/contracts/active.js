@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // CORS Headers
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://one-power-fitness.webflow.io",
@@ -9,37 +10,19 @@ export default async function handler(req, res) {
     "Content-Type, Authorization, x-api-key",
   );
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST")
+    return res.status(405).json({ message: "Gunakan POST" });
 
-  if (req.method !== "POST") {
-    return res
-      .status(405)
-      .json({ errorCodes: ["METHOD_NOT_ALLOWED"], message: "Gunakan POST." });
-  }
+  const { recaptchaToken, firstname, lastname, dateOfBirth, customerNumber } =
+    req.body || {};
 
-  const clientIp =
-    req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "";
-
-  const { recaptchaToken } = req.query;
-  if (!recaptchaToken) {
-    return res.status(400).json({
-      errorCodes: ["BAD_REQUEST"],
-      message: "recaptchaToken wajib diisi",
-    });
-  }
-
-  const { firstname, lastname, dateOfBirth, customerNumber } = req.body || {};
-
-  if (!firstname || !lastname || !dateOfBirth) {
-    return res.status(400).json({
-      errorCodes: ["BAD_REQUEST"],
-      message: "firstname, lastname, dan dateOfBirth wajib diisi",
-    });
+  if (!recaptchaToken || !firstname || !lastname || !dateOfBirth) {
+    return res.status(400).json({ message: "Data tidak lengkap" });
   }
 
   try {
+    // Magicline tetap butuh token di URL, tapi ini dilakukan di SISI SERVER (Aman)
     const baseUrl =
       "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
     const url = `${baseUrl}/connect/v1/contracts?recaptchaToken=${encodeURIComponent(recaptchaToken)}`;
@@ -51,7 +34,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
         "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
         "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/119.0.0.0",
       },
       body: JSON.stringify({
         firstname: firstname.trim(),
@@ -61,30 +44,10 @@ export default async function handler(req, res) {
       }),
     });
 
-    const responseText = await response.text();
-    let data = {};
-    if (responseText) {
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        data = { message: responseText };
-      }
-    }
-
-    if (!response.ok) {
-      console.error(`[API Proxy] Magicline Error (${response.status}):`, data);
-      return res.status(response.status).json({
-        errorCodes: data.errorCodes || ["API_ERROR"],
-        message: data.message || "Gagal mengambil data dari Magicline",
-      });
-    }
-
-    return res.status(200).json(data);
+    const data = await response.json();
+    return res.status(response.status).json(data);
   } catch (error) {
-    console.error("[API Proxy] Server crash:", error);
-    return res.status(500).json({
-      errorCodes: ["SERVER_ERROR"],
-      message: "Koneksi ke server gagal",
-    });
+    console.error("Proxy Error:", error);
+    return res.status(500).json({ message: "Koneksi ke Magicline gagal" });
   }
 }
