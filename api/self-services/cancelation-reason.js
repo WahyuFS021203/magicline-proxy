@@ -3,51 +3,36 @@ export default async function handler(req, res) {
     "Access-Control-Allow-Origin",
     "https://one-power-fitness.webflow.io",
   );
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, x-api-key",
   );
 
   if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
-  if (req.method !== "POST") {
+  if (req.method !== "GET") {
     return res.status(405).json({
       errorCodes: ["METHOD_NOT_ALLOWED"],
-      message: "Gunakan metode POST.",
+      message: "Gunakan metode GET.",
     });
   }
-
-  const { customerId } = req.query;
-
-  if (!customerId) {
-    return res.status(400).json({
-      errorCodes: ["BAD_REQUEST"],
-      message: "Parameter 'customerId' wajib disertakan di URL.",
-    });
-  }
-
-  const payload = req.body || {};
 
   try {
-    console.log(
-      `[API Proxy] Memperbarui data alamat untuk Customer ID: ${customerId}`,
-    );
+    console.log(`[API Proxy] Mengambil daftar alasan pembatalan kontrak...`);
 
     const baseUrl =
       "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
-    const url = `${baseUrl}/v1/customers/${customerId}/self-service/address-data`;
+    const url = `${baseUrl}/v1/memberships/self-service/contract-cancelation-reasons`;
 
     const response = await fetch(url, {
-      method: "POST",
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
+        Accept: "application/json",
         "x-api-key": process.env.MAGICLINE_OPEN_API_KEY,
       },
-      body: JSON.stringify(payload),
     });
 
     const responseText = await response.text();
@@ -64,14 +49,11 @@ export default async function handler(req, res) {
       console.error(`[API Proxy] Magicline Error (${response.status}):`, data);
       return res.status(response.status).json({
         errorCodes: data.errorCodes || ["API_ERROR"],
-        message:
-          data.message ||
-          data.errorMessage ||
-          "Gagal memperbarui data alamat pelanggan",
+        message: data.message || "Gagal mengambil daftar alasan pembatalan",
       });
     }
 
-    console.log(`[API Proxy] Data alamat berhasil diperbarui!`);
+    console.log(`[API Proxy] Daftar alasan pembatalan berhasil diambil!`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server crash:", error);
