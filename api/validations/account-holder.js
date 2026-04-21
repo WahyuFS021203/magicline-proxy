@@ -28,9 +28,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log(
-      `[API Proxy] Memvalidasi nama pemilik rekening: ${accountHolder}`,
-    );
+    console.log(`[API Proxy] Validating account holder name: ${accountHolder}`);
 
     const baseUrl =
       "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
@@ -59,7 +57,7 @@ export default async function handler(req, res) {
     }
 
     console.log(
-      `[API Proxy] Hasil validasi: ${data.valid ? "Valid" : "Tidak Valid"}`,
+      `[API Proxy] Validation result: ${data.valid ? "Valid" : "Invalid"}`,
     );
     return res.status(200).json(data);
   } catch (error) {

@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log(`[API Proxy] Mengambil daftar alasan pembatalan kontrak...`);
+    console.log(`[API Proxy] Fetching contract cancellation reasons...`);
 
     const baseUrl =
       "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`[API Proxy] Daftar alasan pembatalan berhasil diambil!`);
+    console.log(`[API Proxy] Cancellation reasons fetched successfully!`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server crash:", error);

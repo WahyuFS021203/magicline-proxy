@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
   try {
     console.log(
-      `[API Proxy] Mengambil data rate-bundles untuk studioId: ${studioId}`,
+      `[API Proxy] Fetching rate-bundles data for studioId: ${studioId}`,
     );
 
     const url = `https://one-power-fitness-abensberg.api.sandbox.magicline.com/connect/v1/rate-bundle?studioId=${studioId}`;
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`[API Proxy] Sukses mengambil data rate-bundles.`);
+    console.log(`[API Proxy] Successfully fetched rate-bundles data.`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server connection failed:", error);

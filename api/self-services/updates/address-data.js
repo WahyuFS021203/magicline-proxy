@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
   try {
     console.log(
-      `[API Proxy] Memperbarui data alamat untuk Customer ID: ${customerId}`,
+      `[API Proxy] Updating address data for Customer ID: ${customerId}`,
     );
 
     const baseUrl =
@@ -71,7 +71,7 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`[API Proxy] Data alamat berhasil diperbarui!`);
+    console.log(`[API Proxy] Address data updated successfully!`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server crash:", error);

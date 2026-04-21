@@ -32,7 +32,7 @@ export default async function handler(req, res) {
 
   try {
     console.log(
-      `[API Proxy] Mencari customer dengan parameter: ${queryParams}`,
+      `[API Proxy] Searching for customer with parameters: ${queryParams}`,
     );
 
     const baseUrl =
@@ -70,7 +70,7 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`[API Proxy] Customer berhasil ditemukan!`);
+    console.log(`[API Proxy] Customer found successfully!`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server crash:", error);

@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     if (req.method === "GET") {
       console.log(
-        `[API Proxy] GET: Mengambil data pembayaran untuk Customer ID: ${customerId}`,
+        `[API Proxy] GET: Fetching payment data for Customer ID: ${customerId}`,
       );
 
       response = await fetch(url, {
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       });
     } else if (req.method === "POST") {
       console.log(
-        `[API Proxy] POST: Memperbarui data pembayaran untuk Customer ID: ${customerId}`,
+        `[API Proxy] POST: Updating payment data for Customer ID: ${customerId}`,
       );
 
       const payload = req.body || {};
@@ -93,7 +93,7 @@ export default async function handler(req, res) {
     }
 
     // Jika berhasil
-    console.log(`[API Proxy] Proses data pembayaran (GET/POST) berhasil!`);
+    console.log(`[API Proxy] Payment data processed successfully (GET/POST)!`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server crash:", error);

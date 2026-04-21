@@ -28,7 +28,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log(`[API Proxy] Memvalidasi IBAN: ${iban}`);
+    console.log(`[API Proxy] Validating IBAN: ${iban}`);
 
     const baseUrl =
       "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     }
 
     console.log(
-      `[API Proxy] IBAN Valid: ${data.validIban}. Bank: ${data.bankName || "Tidak diketahui"}`,
+      `[API Proxy] IBAN valid: ${data.validIban}. Bank: ${data.bankName || "Unknown"}`,
     );
     return res.status(200).json(data);
   } catch (error) {

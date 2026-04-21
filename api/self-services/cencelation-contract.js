@@ -38,7 +38,7 @@ export default async function handler(req, res) {
 
     if (req.method === "GET") {
       console.log(
-        `[API Proxy] GET: Mengambil data kontrak untuk ID: ${customerId}`,
+        `[API Proxy] GET: Fetching contract data for ID: ${customerId}`,
       );
 
       const getUrl = `${baseUrl}/v1/memberships/${customerId}/self-service/contract-data`;
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
       });
     } else if (req.method === "POST") {
       console.log(
-        `[API Proxy] POST: Memproses pembatalan kontrak untuk ID: ${customerId}`,
+        `[API Proxy] POST: Processing contract cancellation for ID: ${customerId}`,
       );
 
       const payload = req.body || {};
@@ -103,7 +103,7 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`[API Proxy] Kontrak berhasil diproses (${req.method})!`);
+    console.log(`[API Proxy] Contract processed successfully (${req.method})!`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server crash:", error);

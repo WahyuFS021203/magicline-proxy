@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 
   try {
     console.log(
-      `[API Proxy] Membuat kontrak baru (Studio: ${payload.studioId || "Default"})`,
+      `[API Proxy] Creating a new contract (Studio: ${payload.studioId || "Default"})`,
     );
 
     const url =
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`[API Proxy] Kontrak berhasil dibuat!`);
+    console.log(`[API Proxy] Contract created successfully!`);
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server connection failed:", error);

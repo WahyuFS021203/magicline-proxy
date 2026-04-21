@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     // ==========================================
     if (req.method === "GET") {
       console.log(
-        `[API Proxy] GET: Mengambil Master Data untuk Customer ID: ${customerId}`,
+        `[API Proxy] GET: Fetching master data for Customer ID: ${customerId}`,
       );
 
       response = await fetch(url, {
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     // ==========================================
     else if (req.method === "POST") {
       console.log(
-        `[API Proxy] POST: Memperbarui Master Data untuk Customer ID: ${customerId}`,
+        `[API Proxy] POST: Updating master data for Customer ID: ${customerId}`,
       );
 
       const payload = req.body || {};
@@ -102,7 +102,9 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`[API Proxy] Master Data berhasil diproses (${req.method})!`);
+    console.log(
+      `[API Proxy] Master data processed successfully (${req.method})!`,
+    );
     return res.status(200).json(data);
   } catch (error) {
     console.error("[API Proxy] Server crash:", error);
