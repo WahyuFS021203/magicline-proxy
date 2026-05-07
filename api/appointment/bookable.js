@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     // METODE 1: GET (MENCARI SLOT KOSONG)
     // ==========================================
     if (req.method === "GET") {
-      const { customerId, slotWindowStartDate, daysAhead = "1" } = req.query;
+      const { slotWindowStartDate, daysAhead = "1" } = req.query;
 
       if (!customerId || !slotWindowStartDate) {
         return res.status(400).json({
