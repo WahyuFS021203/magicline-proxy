@@ -86,7 +86,7 @@ export default async function handler(req, res) {
           : Number(HARDCODED_APPOINTMENT_ID),
         startDateTime: payload.startDateTime,
         endDateTime: payload.endDateTime,
-        instructorIds: payload.instructorIds || [],
+        instructorIds: [0] || [],
       };
 
       const postUrl = `${baseUrl}/v1/appointments/booking/book`;
