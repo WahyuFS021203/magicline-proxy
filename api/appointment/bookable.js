@@ -35,21 +35,19 @@ export default async function handler(req, res) {
     if (req.method === "GET") {
       const { customerId, slotWindowStartDate, daysAhead = "1" } = req.query;
 
-      return res.status(400).json({
-        errorCodes: ["BAD_REQUEST"],
-        message:
-          "Parameter 'customerId' dan 'slotWindowStartDate' wajib disertakan.",
-      });
-
       console.log(
-        `[API Proxy] GET: Mencari Slot ID: ${HARDCODED_APPOINTMENT_ID}, Tanggal: ${slotWindowStartDate}`,
+        `[API Proxy] GET: Mencari Slot ID: ${HARDCODED_APPOINTMENT_ID}, Tanggal: ${slotWindowStartDate || "Tidak ditentukan"}`,
       );
 
-      const queryParams = new URLSearchParams({
-        customerId: customerId,
-        daysAhead: daysAhead,
-        slotWindowStartDate: slotWindowStartDate,
-      }).toString();
+      const queryObj = {};
+
+      if (customerId) queryObj.customerId = customerId;
+      if (slotWindowStartDate)
+        queryObj.slotWindowStartDate = slotWindowStartDate;
+      if (daysAhead) queryObj.daysAhead = daysAhead;
+
+      // Jadikan format URL string (contoh: ?daysAhead=1&slotWindowStartDate=2026-05-07)
+      const queryParams = new URLSearchParams(queryObj).toString();
 
       const getUrl = `${baseUrl}/v1/appointments/bookable/${HARDCODED_APPOINTMENT_ID}/slots?${queryParams}`;
 
