@@ -33,15 +33,13 @@ export default async function handler(req, res) {
     // METODE 1: GET (MENCARI SLOT KOSONG)
     // ==========================================
     if (req.method === "GET") {
-      const { slotWindowStartDate, daysAhead = "1" } = req.query;
+      const { customerId, slotWindowStartDate, daysAhead = "1" } = req.query;
 
-      if (!customerId || !slotWindowStartDate) {
-        return res.status(400).json({
-          errorCodes: ["BAD_REQUEST"],
-          message:
-            "Parameter 'customerId' dan 'slotWindowStartDate' wajib disertakan.",
-        });
-      }
+      return res.status(400).json({
+        errorCodes: ["BAD_REQUEST"],
+        message:
+          "Parameter 'customerId' dan 'slotWindowStartDate' wajib disertakan.",
+      });
 
       console.log(
         `[API Proxy] GET: Mencari Slot ID: ${HARDCODED_APPOINTMENT_ID}, Tanggal: ${slotWindowStartDate}`,
