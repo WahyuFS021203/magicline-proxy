@@ -63,6 +63,8 @@ export default async function handler(req, res) {
     else if (req.method === "POST") {
       const payload = req.body || {};
 
+      console.log("[API Proxy] Raw payload received:", JSON.stringify(payload)); // ← tambahkan
+
       if (
         !payload.customerId ||
         !payload.startDateTime ||
@@ -74,12 +76,6 @@ export default async function handler(req, res) {
             "Data booking tidak lengkap (customerId, startDateTime, endDateTime wajib diisi).",
         });
       }
-
-      console.log(
-        `[API Proxy] POST: Membooking Jadwal untuk Customer ID: ${payload.customerId}`,
-      );
-
-      console.log(`[API Proxy] Booking Data:`, JSON.stringify(bookingData));
 
       const bookingData = {
         customerId: Number(payload.customerId),
@@ -94,17 +90,31 @@ export default async function handler(req, res) {
             : [1210118510],
       };
 
-      const postUrl = `${baseUrl}/v1/appointments/booking/book`;
+      console.log(
+        "[API Proxy] Booking data to Magicline:",
+        JSON.stringify(bookingData),
+      ); // ← tambahkan
 
-      response = await fetch(postUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "x-api-key": apiKey,
-        },
-        body: JSON.stringify(bookingData),
-      });
+      try {
+        const postUrl = `${baseUrl}/v1/appointments/booking/book`;
+        console.log("[API Proxy] Posting to:", postUrl); // ← tambahkan
+
+        response = await fetch(postUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "x-api-key": apiKey,
+          },
+          body: JSON.stringify(bookingData),
+        });
+      } catch (fetchError) {
+        console.error("[API Proxy] Fetch error:", fetchError); // ← tambahkan
+        return res.status(500).json({
+          errorCodes: ["FETCH_ERROR"],
+          message: fetchError.message,
+        });
+      }
     }
 
     // ==========================================
