@@ -79,6 +79,8 @@ export default async function handler(req, res) {
         `[API Proxy] POST: Membooking Jadwal untuk Customer ID: ${payload.customerId}`,
       );
 
+      console.log(`[API Proxy] Booking Data:`, JSON.stringify(bookingData));
+
       const bookingData = {
         customerId: Number(payload.customerId),
         bookableAppointmentId: payload.bookableAppointmentId
@@ -87,7 +89,9 @@ export default async function handler(req, res) {
         startDateTime: payload.startDateTime,
         endDateTime: payload.endDateTime,
         instructorIds:
-          payload.instructorIds?.length > 0 ? payload.instructorIds : [],
+          payload.instructorIds?.length > 0
+            ? payload.instructorIds.map(Number)
+            : [1210118510],
       };
 
       const postUrl = `${baseUrl}/v1/appointments/booking/book`;
