@@ -30,8 +30,7 @@ export default async function handler(req, res) {
   try {
     console.log(`[API Proxy] Validating IBAN: ${iban}`);
 
-    const baseUrl =
-      "https://one-power-fitness-abensberg.api.sandbox.magicline.com";
+    const baseUrl = "https://one-power-fitness.api.magicline.com";
 
     const url = `${baseUrl}/connect/v1/bankaccount?iban=${iban}`;
 

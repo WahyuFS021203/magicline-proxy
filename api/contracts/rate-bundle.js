@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       `[API Proxy] Fetching rate-bundles data for studioId: ${studioId}`,
     );
 
-    const url = `https://one-power-fitness-abensberg.api.sandbox.magicline.com/connect/v1/rate-bundle?studioId=${studioId}`;
+    const url = `https://one-power-fitness.api.magicline.com/connect/v1/rate-bundle?studioId=${studioId}`;
 
     const response = await fetch(url, {
       method: "GET",
