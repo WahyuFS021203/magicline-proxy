@@ -23,8 +23,7 @@ export default async function handler(req, res) {
   try {
     console.log(`[API Proxy] Fetching contract cancellation reasons...`);
 
-    const baseUrl =
-      "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
+    const baseUrl = "https://one-power-fitness.open-api.magicline.com";
     const url = `${baseUrl}/v1/memberships/self-service/contract-cancelation-reasons`;
 
     const response = await fetch(url, {

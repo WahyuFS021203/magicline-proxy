@@ -35,8 +35,7 @@ export default async function handler(req, res) {
       `[API Proxy] Searching for customer with parameters: ${queryParams}`,
     );
 
-    const baseUrl =
-      "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
+    const baseUrl = "https://one-power-fitness.open-api.magicline.com";
     const url = `${baseUrl}/v1/customers/by?${queryParams}`;
 
     // 4. Fetch ke Magicline

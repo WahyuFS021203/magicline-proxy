@@ -29,8 +29,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const baseUrl =
-    "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
+  const baseUrl = "https://one-power-fitness.open-api.magicline.com";
   const apiKey = process.env.MAGICLINE_OPEN_API_KEY;
 
   try {

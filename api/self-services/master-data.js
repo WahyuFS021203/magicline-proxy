@@ -34,8 +34,7 @@ export default async function handler(req, res) {
   }
 
   // Pengaturan URL Magicline
-  const baseUrl =
-    "https://one-power-fitness-abensberg.open-api.sandbox.magicline.com";
+  const baseUrl = "https://one-power-fitness.open-api.magicline.com";
   const url = `${baseUrl}/v1/customers/${customerId}/self-service/master-data`;
   const apiKey = process.env.MAGICLINE_OPEN_API_KEY;
 
