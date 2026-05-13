@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed. Use GET." });
   }
 
-  const studioId = 1210004670;
+  const studioId = 1210012010;
 
   try {
     console.log(
