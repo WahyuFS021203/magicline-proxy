@@ -1,8 +1,16 @@
 export default async function handler(req, res) {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
+  const allowedOrigins = [
     "https://one-power-fitness.webflow.io",
-  );
+    "https://www.one-power-fitness.de",
+  ];
+
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+
+  res.setHeader("Vary", "Origin");
+
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",

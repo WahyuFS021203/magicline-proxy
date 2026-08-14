@@ -1,21 +1,27 @@
 export default async function handler(req, res) {
-  // 1. Pengaturan CORS (Izinkan GET dan POST)
-  res.setHeader(
-    "Access-Control-Allow-Origin",
+  const allowedOrigins = [
     "https://one-power-fitness.webflow.io",
-  );
+    "https://www.one-power-fitness.de",
+  ];
+
+  // 2. CEK ORIGIN REQUEST
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+
+  res.setHeader("Vary", "Origin");
+
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, x-api-key",
   );
 
-  // 2. Tangani Preflight Request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // 3. Pastikan hanya GET atau POST yang diizinkan
   if (req.method !== "GET" && req.method !== "POST") {
     return res.status(405).json({
       errorCodes: ["METHOD_NOT_ALLOWED"],
@@ -23,7 +29,6 @@ export default async function handler(req, res) {
     });
   }
 
-  // 4. Validasi parameter customerId
   const { customerId } = req.query;
   if (!customerId) {
     return res.status(400).json({
