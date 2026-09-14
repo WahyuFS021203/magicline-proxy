@@ -2,6 +2,7 @@ export default async function handler(req, res) {
   const allowedOrigins = [
     "https://one-power-fitness.webflow.io",
     "https://www.one-power-fitness.de",
+    "https://one-power-fitness.de",
   ];
 
   // 2. CEK ORIGIN REQUEST
