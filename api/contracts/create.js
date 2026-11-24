@@ -37,8 +37,9 @@ const inFlight = new Set();
 const recentlyCreated = new Map(); // email -> { at, data, customer }
 
 const MSG_EMAIL_EXISTS =
-  "Mit dieser E-Mail-Adresse besteht bereits ein Konto bei ONE power fitness. " +
-  "Bitte verwende eine andere E-Mail-Adresse oder melde dich direkt im Studio.";
+  "Mit dieser E-Mail-Adresse besteht bereits ein Konto bei ONE power fitness Abensberg. " +
+  "Bitte verwende eine andere E-Mail-Adresse oder kontaktiere uns über das Kontaktformular " +
+  "auf unserer Homepage unter Kontakt → Allgemeine Anfragen.";
 const MSG_IN_PROGRESS =
   "Deine Anmeldung wird bereits verarbeitet. Bitte warte einen Moment und sende das Formular nicht erneut ab.";
 
