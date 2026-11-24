@@ -1403,6 +1403,25 @@ function stepForm() {
 
         if (errorContainer) {
           errorContainer.innerText = errorMsg;
+
+          // E-Mail already registered: message with a direct link to the
+          // contact form ("Allgemeine Anfragen"), text requested by the studio.
+          if (result.errorCodes?.includes("EMAIL_ALREADY_REGISTERED")) {
+            const contactLink = document.createElement("a");
+            contactLink.href = "/kontakt?select=Allgemeine%20Anfragen#kontakt";
+            contactLink.target = "_blank";
+            contactLink.rel = "noopener";
+            contactLink.textContent = "Kontakt → Allgemeine Anfragen";
+            contactLink.style.color = "inherit";
+            contactLink.style.textDecoration = "underline";
+            errorContainer.replaceChildren(
+              "Mit dieser E-Mail-Adresse besteht bereits ein Konto bei ONE power fitness Abensberg. " +
+                "Bitte verwende eine andere E-Mail-Adresse oder kontaktiere uns über das Kontaktformular auf unserer Homepage unter ",
+              contactLink,
+              "."
+            );
+          }
+
           errorContainer.style.display = "block";
         }
       }
